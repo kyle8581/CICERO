@@ -27,22 +27,22 @@ def generation(split, relation):
     f = open("data/" + split + "_" + relation + ".json", "w")
     for instance in data:
         if questions[relation] == instance["Question"]:
+            t = instance["Target"]
+            utts = [u[3:] for u in instance["Dialogue"]]
+            if t in utts:
+                index = utts.index(t)
+            else:
+                index = np.argmax([fuzz.token_set_ratio(u, t) for u in utts])
             if relation != "subseq_event_clipped":
                 c = " <utt> ".join(instance["Dialogue"])
-            else:
-                t = instance["Target"]
-                utts = [u[3:] for u in instance["Dialogue"]]
-                if t in utts:
-                    index = utts.index(t)
-                else:
-                    index = np.argmax([fuzz.token_set_ratio(u, t) for u in utts])
-                    
+                history = instance['Dialogue']
+            else:   
                 c = " <utt> ".join(instance["Dialogue"][:index+1])
-                
+                history = instance['Dialogue'][:index+1]
             context = sep.join([instance["Question"], "target: " + instance["Target"], 
                                 "context: " + c])
             written_answer = instance["Choices"][instance["Human Written Answer"][0]]
-            line = {"input": context, "output": written_answer}
+            line = {"input": context, "output": written_answer, "id": instance["ID"], "target": instance["Target"], "relation": relation, "context": instance['Dialogue'], "index": int(index)}
             f.write(json.dumps(line) + "\n")
     f.close()
     

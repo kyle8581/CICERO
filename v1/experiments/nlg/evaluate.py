@@ -71,7 +71,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=16, help="Batch size for generation.")
     parser.add_argument("--input_path", type=str, help="Input json file.")
     parser.add_argument("--output_path", type=str, default="", help="Json file to save generated outputs.")
-    parser.add_argument("--model_name_or_path", type=str, default="", help="Model to use for generation.")
+    parser.add_argument("--model_name_or_path", type=str, default="declare-lab/dialect", help="Model to use for generation.")
     args = parser.parse_args()
     
     ## Read input json and specify output path ##
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         for j in range(len(generated)):
             instance = data[j]
             ## Separate beam outputs with " && " ##
-            instance["generated"] = " && ".join(generated[j]) 
+            instance["generated"] = generated[j] 
             f.write(json.dumps(instance) + "\n")
         
     ## Compute metrics with the best beam search output ## 
